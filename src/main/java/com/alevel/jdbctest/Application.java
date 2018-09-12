@@ -25,7 +25,7 @@ public class Application {
         }
 
         String url = connectionProps.getProperty("url");
-        /*try (Connection connection = DriverManager.getConnection(url, connectionProps)) {
+        try (Connection connection = DriverManager.getConnection(url, connectionProps)) {
             try (PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM ranks")) {
                 ResultSet resultSet = preparedStatement.executeQuery(); //ne nado v try s resourse but closeable
                 while (resultSet.next()) { //-1 firstly
@@ -38,7 +38,7 @@ public class Application {
             }
         } catch (SQLException e) {
             panic(e);
-        } */
+        }
 
         try (Connection connection = DriverManager.getConnection(url, connectionProps)) {
             Supplier<Connection> connectionSupplier = new SingleConnectionPool(connection);
