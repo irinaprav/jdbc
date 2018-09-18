@@ -2,6 +2,8 @@ package com.alevel.jdbctest;
 
 import com.alevel.jdbctest.common.SingleConnectionPool;
 import com.alevel.jdbctest.common.StorageException;
+import com.alevel.jdbctest.game.Game;
+import com.alevel.jdbctest.game.GameRepository;
 import com.alevel.jdbctest.player.Player;
 import com.alevel.jdbctest.player.PlayerRepository;
 
@@ -51,6 +53,16 @@ public class Application {
             }*/
             Player player = playerRepository.get(new Long(2));
             System.out.println(player.toString());
+        } catch (SQLException | StorageException e) {
+            panic(e);
+        }
+        try (Connection connection = DriverManager.getConnection(url, connectionProps)) {
+            Supplier<Connection> connectionSupplier = new SingleConnectionPool(connection);
+            GameRepository game = new GameRepository(connectionSupplier);
+            Game game1 = new Game(new Long(2),new Long(2),new Long(450));
+            game1.getPlayers().add(new Long(2));
+            game1.getPlayers().add(new Long(3));
+            game.save(game1);
         } catch (SQLException | StorageException e) {
             panic(e);
         }

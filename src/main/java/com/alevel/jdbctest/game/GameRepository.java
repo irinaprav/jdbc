@@ -26,15 +26,15 @@ public class GameRepository implements Repository<Game, Long> {
         Long winner_id = entity.getWinner_id();
         String sql = "INSERT INTO games (mvp_id,score) VALUES (?, ?) " +
                 "ON DUPLICATE KEY UPDATE  mvp_id = ?, score = ?";
-
+        String sqlQuery = "INSERT INTO participiants (player_id,game_id) VALUES (?, ?) " +
+                "ON DUPLICATE KEY UPDATE  player_id = ?, game_id = ?";
+        String sqlQueryUpdate = "UPDATE players SET players.score = ? WHERE players.id = ? ";
         try (PreparedStatement statement = connectionSupplier.get().prepareStatement(sql)) {
             statement.setLong(1, winner_id);
             statement.setLong(2, score);
             statement.setLong(3, winner_id);
             statement.setLong(4, score);
             statement.executeUpdate();
-            String sqlQuery = "INSERT INTO participiants (player_id,game_id) VALUES (?, ?) " +
-                    "ON DUPLICATE KEY UPDATE  player_id = ?, game_id = ?";
             try (PreparedStatement statement1 = connectionSupplier.get().prepareStatement(sqlQuery)) {
                 for (Long player : entity.getPlayers()) {
                     statement1.setLong(1, player);
@@ -45,6 +45,13 @@ public class GameRepository implements Repository<Game, Long> {
                 }
             } catch (SQLException e) {
                 throw new StorageException(e);
+            }
+            try (PreparedStatement statementqu = connectionSupplier.get().prepareStatement(sqlQueryUpdate)) {
+                statementqu.setLong(1, entity.getScore());
+                statementqu.setLong(2, entity.getWinner_id());
+                statementqu.executeUpdate();
+            } catch (SQLException ex) {
+                throw new StorageException(ex);
             }
         } catch (SQLException e) {
             throw new StorageException(e);
